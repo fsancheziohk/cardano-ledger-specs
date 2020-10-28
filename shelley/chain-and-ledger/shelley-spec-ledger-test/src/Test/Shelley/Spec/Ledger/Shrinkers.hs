@@ -24,9 +24,9 @@ import Shelley.Spec.Ledger.PParams
 import Shelley.Spec.Ledger.Scripts
 import Shelley.Spec.Ledger.Slot
 import Shelley.Spec.Ledger.Tx
-import Shelley.Spec.Ledger.TxBody
+import Shelley.Spec.Ledger.TxBody 
 import Test.QuickCheck (shrinkIntegral, shrinkList)
-import Test.Shelley.Spec.Ledger.Utils (ShelleyTest)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, STGens)
 
 shrinkBlock ::
   Block h ->
@@ -35,7 +35,7 @@ shrinkBlock _ = []
 
 shrinkTx ::
   forall era.
-  ShelleyTest era =>
+  STGens era =>
   Tx era ->
   [Tx era]
 shrinkTx (Tx _b _ws _md) =
@@ -53,7 +53,7 @@ shrinkTx (Tx _b _ws _md) =
 -- ======
 shrinkTxBody ::
   forall era.
-  ShelleyTest era =>
+  STGens era =>
   TxBody era ->
   [TxBody era]
 -- do not shrink body in case of empty output list
@@ -82,6 +82,7 @@ shrinkTxBody (TxBody is os@( (:<|) (TxOut a vs) _ ) cs ws tf tl tu md) =
     -- put all the non-ada tokens in the head of the outputs, append shrunk list
     mvExtraTksnToOut1 Empty = empty
     mvExtraTksnToOut1 sr = (TxOut a (vs <+> (extraTokens sr) <-> (Val.inject $ extraCoin sr))) <| sr
+
 outputBalance :: ShelleyTest era => StrictSeq (TxOut era) -> Core.Value era
 outputBalance = foldl' (\v (TxOut _ c) -> v <+> c) mempty
 

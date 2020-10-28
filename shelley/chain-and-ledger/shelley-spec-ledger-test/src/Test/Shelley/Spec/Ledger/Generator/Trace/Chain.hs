@@ -108,7 +108,7 @@ lastByronHeaderHash _ = HashHeader $ mkHash 0
 mkGenesisChainState ::
   forall era a.
   (ShelleyTest era) =>
-  Gen (Core.Value era) ->
+  Gen (Core.TxBody era) ->
   Constants ->
   IRC (CHAIN era) ->
   Gen (Either a (ChainState era))

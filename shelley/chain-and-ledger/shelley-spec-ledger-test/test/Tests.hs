@@ -17,13 +17,13 @@ import Test.Shelley.Spec.Ledger.ValProp (valTests)
 import Test.Tasty
 import Test.TestScenario (TestScenario (..), mainWithTestScenario)
 
-tests :: Gen (Core.Value C) -> TestTree
+tests :: Gen (Core.TxBody C) -> TestTree
 tests gv = askOption $ \case
   Nightly -> (nightlyTests gv)
   Fast -> fastTests
   _ -> (mainTests gv)
 
-mainTests :: Gen (Core.Value C) -> TestTree
+mainTests :: Gen (Core.TxBody C) -> TestTree
 mainTests gv =
   testGroup
     "Ledger with Delegation"
@@ -37,7 +37,7 @@ mainTests gv =
       valTests
     ]
 
-nightlyTests :: Gen (Core.Value C) -> TestTree
+nightlyTests :: Gen (Core.TxBody C) -> TestTree
 nightlyTests gv =
   testGroup
     "Ledger with Delegation nightly"

@@ -149,7 +149,7 @@ instance
 mkGenesisLedgerState ::
   forall a c.
   (CryptoClass.Crypto c) =>
-  Gen (Core.Value (ShelleyEra c)) ->
+  Gen (Core.TxBody (ShelleyEra c)) ->
   Constants ->
   IRC (LEDGER (ShelleyEra c)) ->
   Gen (Either a (UTxOState (ShelleyEra c), DPState (ShelleyEra c)))

@@ -180,6 +180,7 @@ import qualified Shelley.Spec.Ledger.Tx as Ledger
 import Shelley.Spec.Ledger.TxBody
   ( DCert,
     TxOut,
+    Wdrl,
     unWdrl,
     pattern TxBody,
     pattern Wdrl,
@@ -777,6 +778,8 @@ genesisCoins outs =
 -- | Apply a transaction body as a state transition function on the ledger state.
 applyTxBody ::
   ( ShelleyTest era,
+    HasField "txfee" (Core.TxBody era) Coin,
+    HasField "wdrls" (Core.TxBody era) (Wdrl era),
     HasField "inputs" (Core.TxBody era) (Set (TxIn era)),
     HasField "outputs" (Core.TxBody era) (StrictSeq (TxOut era)),
     HasField "certs" (Core.TxBody era) (StrictSeq (DCert era))

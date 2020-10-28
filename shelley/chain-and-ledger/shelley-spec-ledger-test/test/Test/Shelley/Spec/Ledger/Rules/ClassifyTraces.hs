@@ -103,7 +103,7 @@ import Test.QuickCheck.Gen (Gen (..))
 genesisChainState ::
   forall era a.
   ShelleyTest era =>
-  Gen (Core.Value era) ->
+  Gen (Core.TxBody era) ->
   Maybe
     ( Control.State.Transition.Extended.IRC (CHAIN era) ->
       QC.Gen
@@ -120,7 +120,7 @@ genesisChainState gv = Just $ mkGenesisChainState gv (geConstants (genEnv p))
 genesisLedgerState ::
   forall c a.
   Crypto c =>
-  Gen (Core.Value (ShelleyEra c)) ->
+  Gen (Core.TxBody (ShelleyEra c)) ->
   Maybe
     ( Control.State.Transition.Extended.IRC (LEDGER (ShelleyEra c)) ->
       QC.Gen
@@ -136,7 +136,7 @@ genesisLedgerState gv = Just $ mkGenesisLedgerState gv (geConstants (genEnv p))
     p :: Proxy (ShelleyEra c)
     p = Proxy
 
-relevantCasesAreCovered :: Gen (Core.Value C) -> Property
+relevantCasesAreCovered :: Gen (Core.TxBody C) -> Property
 relevantCasesAreCovered gv = do
   let tl = 100
   checkCoverage $
@@ -295,7 +295,7 @@ hasMetaData tx =
     f SNothing = False
     f (SJust _) = True
 
-onlyValidLedgerSignalsAreGenerated :: Gen (Core.Value C) -> Property
+onlyValidLedgerSignalsAreGenerated :: Gen (Core.TxBody C) -> Property
 onlyValidLedgerSignalsAreGenerated gv =
   withMaxSuccess 200 $
     onlyValidSignalsAreGeneratedFromInitState @(LEDGER C) testGlobals 100 (genEnv p) (genesisLedgerState gv)
@@ -305,7 +305,7 @@ onlyValidLedgerSignalsAreGenerated gv =
 
 -- | Check that the abstract transaction size function
 -- actually bounds the number of bytes in the serialized transaction.
-propAbstractSizeBoundsBytes :: Gen (Core.Value C) -> Property
+propAbstractSizeBoundsBytes :: Gen (Core.TxBody C) -> Property
 propAbstractSizeBoundsBytes gv = property $ do
   let tl = 100
       numBytes = toInteger . BS.length . serialize'
@@ -319,7 +319,7 @@ propAbstractSizeBoundsBytes gv = property $ do
 
 -- | Check that the abstract transaction size function
 -- is not off by an acceptable order of magnitude.
-propAbstractSizeNotTooBig :: Gen (Core.Value C) -> Property
+propAbstractSizeNotTooBig :: Gen (Core.TxBody C) -> Property
 propAbstractSizeNotTooBig gv = property $ do
   let tl = 100
       -- The below acceptable order of magnitude may not actually be large enough.
@@ -338,7 +338,7 @@ propAbstractSizeNotTooBig gv = property $ do
     p :: Proxy C
     p = Proxy
 
-onlyValidChainSignalsAreGenerated :: Gen (Core.Value C) -> Property
+onlyValidChainSignalsAreGenerated :: Gen (Core.TxBody C) -> Property
 onlyValidChainSignalsAreGenerated gv =
   withMaxSuccess 100 $
     onlyValidSignalsAreGeneratedFromInitState @(CHAIN C) testGlobals 100 (genEnv p) (genesisChainState gv)

@@ -104,7 +104,7 @@ longTraceLen = 150
 ---------------------------------------------------------------------
 
 -- | Tx inputs are eliminated, outputs added to utxo and TxIds are unique
-collisionFreeComplete :: Gen (Core.Value C) -> Property
+collisionFreeComplete :: Gen (Core.TxBody C) -> Property
 collisionFreeComplete gv =
   forAllChainTrace gv traceLen $ \tr -> do
     let ssts = sourceSignalTargets tr
@@ -119,7 +119,7 @@ collisionFreeComplete gv =
       ]
 
 -- | Various preservation properties
-adaPreservationChain :: Gen (Core.Value C) -> Property
+adaPreservationChain :: Gen (Core.TxBody C) -> Property
 adaPreservationChain gv =
   forAllChainTrace gv longTraceLen $ \tr -> do
     let ssts = sourceSignalTargets tr
@@ -473,7 +473,7 @@ feesNonDecreasing SourceSignalTarget {source, target} =
 
 -- | Various properties of the POOL STS Rule, tested on longer traces
 -- (double the default length)
-poolProperties :: Gen (Core.Value C) -> Property
+poolProperties :: Gen (Core.TxBody C) -> Property
 poolProperties gv =
   forAllChainTrace gv traceLen $ \tr -> do
     let ssts = sourceSignalTargets tr
@@ -519,7 +519,7 @@ poolStateIsInternallyConsistent (SourceSignalTarget {source = chainSt, signal = 
 
 -- | Various properties of the POOL STS Rule, tested on longer traces
 -- (double the default length)
-delegProperties :: Gen (Core.Value C) -> Property
+delegProperties :: Gen (Core.TxBody C) -> Property
 delegProperties gv =
   forAllChainTrace gv traceLen $ \tr -> do
     conjoin $
@@ -650,7 +650,7 @@ chainSstWithTick ledgerTr =
 -- Properties for PoolReap (using the CHAIN Trace) --
 ----------------------------------------------------------------------
 
-removedAfterPoolreap :: Gen (Core.Value C) -> Property
+removedAfterPoolreap :: Gen (Core.TxBody C) -> Property
 removedAfterPoolreap gv =
   forAllChainTrace gv traceLen $ \tr ->
     conjoin $
@@ -670,7 +670,7 @@ removedAfterPoolreap gv =
 
 forAllChainTrace ::
   (Testable prop) =>
-  Gen (Core.Value C) ->
+  Gen (Core.TxBody C) ->
   Word64 -> -- trace length
   (Trace (CHAIN C) -> prop) ->
   Property

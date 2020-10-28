@@ -113,7 +113,7 @@ import Test.Shelley.Spec.Ledger.Generator.Core
 import Test.Shelley.Spec.Ledger.Generator.MetaData (genMetaData)
 import Test.Shelley.Spec.Ledger.Generator.Trace.DCert (genDCerts)
 import Test.Shelley.Spec.Ledger.Generator.Update (genUpdate)
-import Test.Shelley.Spec.Ledger.Utils (MultiSigPairs, ShelleyTest, Split (..))
+import Test.Shelley.Spec.Ledger.Utils (MultiSigPairs, ShelleyTest, Split (..), STGens)
 
 showBalance ::
   ( ShelleyTest era,
@@ -159,7 +159,7 @@ showBalance
 genTx ::
   forall era.
   ( HasCallStack,
-    ShelleyTest era,
+    STGens era,
     Mock (Crypto era)
   ) =>
   GenEnv era ->
@@ -294,7 +294,9 @@ deltaZero initialfee minAda addr =
 -- | - Do the work of computing what additioanl inputs we need to 'fix-up' the transaction so that it will balance.
 genNextDelta ::
   forall era.
-  (ShelleyTest era, Mock (Crypto era)) =>
+  (ShelleyTest era,
+  Mock (Crypto era),
+  HasField "inputs" (Core.TxBody era) (Set (TxIn era))) =>
   UTxO era ->
   PParams era ->
   KeySpace era ->
@@ -350,7 +352,7 @@ genNextDelta
                       UTxO $
                         Map.withoutKeys
                           (unUTxO utxo)
-                          ((_inputs . _body) tx <> extraInputs)
+                          ((getField @"inputs" (_body tx)) <> extraInputs)
                 (inputs, value, (vkeyPairs, msigPairs)) <- genInputs (1, 1) ksIndexedPaymentKeys ksIndexedPayScripts utxo'
                 -- It is possible that the Utxo has no possible inputs left, so fail. We try and keep this from happening
                 -- by using feedback: adding to the number of ouputs (in the call to genRecipients) in genTx above. Adding to the
@@ -382,7 +384,7 @@ genNextDelta
 -- genNextDelta repeatedly until genNextDelta delta = delta
 
 genNextDeltaTilFixPoint ::
-  (ShelleyTest era, Mock (Crypto era)) =>
+  (STGens era, Mock (Crypto era)) =>
   Coin ->
   KeyPairs (Crypto era) ->
   MultiSigPairs era ->
@@ -400,8 +402,10 @@ genNextDeltaTilFixPoint initialfee keys scripts utxo pparams keySpace tx = do
     -- add a small offset here to ensure outputs above minUtxo value
     safetyOffset = Coin 5
 
+
+-- TODO can we set the body' fields agnotically of the exact TxBody type?
 applyDelta ::
-  (ShelleyTest era, Mock (Crypto era)) =>
+  (STGens era, Mock (Crypto era)) =>
   [KeyPair 'Witness (Crypto era)] ->
   Map (ScriptHash era) (MultiSig era) ->
   KeySpace era ->
@@ -438,7 +442,7 @@ fix :: (Eq d, Monad m) => (d -> m d) -> d -> m d
 fix f d = do d1 <- f d; if d1 == d then pure d else fix f d1
 
 converge ::
-  (ShelleyTest era, Mock (Crypto era)) =>
+  (STGens era, Mock (Crypto era)) =>
   Coin ->
   [KeyPair 'Witness (Crypto era)] ->
   Map (ScriptHash era) (MultiSig era) ->
@@ -533,7 +537,7 @@ mkTxWits
 
 -- | Generate a transaction body with the given inputs/outputs and certificates
 genTxBody ::
-  (ShelleyTest era) =>
+  (STGens era) =>
   [TxIn era] ->
   StrictSeq (TxOut era) ->
   StrictSeq (DCert era) ->

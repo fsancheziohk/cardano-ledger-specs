@@ -37,6 +37,7 @@ module Test.Shelley.Spec.Ledger.Utils
     getBlockNonce,
     ShelleyTest,
     Split (..),
+    STGens,
   )
 where
 
@@ -56,6 +57,7 @@ import Cardano.Crypto.KES
     deriveVerKeyKES,
     genKeyKES,
   )
+import Shelley.Spec.Ledger.TxBody (TxBody (..))
 import Cardano.Crypto.KES.Class (ContextKES)
 import Cardano.Crypto.Libsodium.MLockedBytes (mlsbFromByteString)
 import Cardano.Crypto.Seed (Seed, getSeedBytes, mkSeedFromBytes)
@@ -129,7 +131,6 @@ import Shelley.Spec.Ledger.STS.Utxo (UTXO, UtxoPredicateFailure)
 import Shelley.Spec.Ledger.STS.Utxow (UTXOW, UtxowPredicateFailure)
 import Shelley.Spec.Ledger.Scripts (MultiSig)
 import Shelley.Spec.Ledger.Slot (EpochNo, EpochSize (..), SlotNo)
-import Shelley.Spec.Ledger.Tx (TxBody)
 import Test.Tasty.HUnit
   ( Assertion,
     (@?=),
@@ -138,7 +139,6 @@ import Test.Tasty.HUnit
 type ShelleyTest era =
   ( ShelleyBased era,
     Split (Core.Value era),
-    Core.TxBody era ~ TxBody era,
     Core.Script era ~ MultiSig era,
     PredicateFailure (CHAIN era) ~ ChainPredicateFailure era,
     PredicateFailure (LEDGERS era) ~ LedgersPredicateFailure era,
@@ -152,6 +152,8 @@ type ShelleyTest era =
 
 class Split v where
   vsplit :: v -> Integer -> ([v], Coin)
+
+type STGens era = (ShelleyTest era, Core.TxBody era ~ TxBody era)
 
 -- =======================================================
 

@@ -131,7 +131,7 @@ import Test.Shelley.Spec.Ledger.Serialisation.Generators.Bootstrap
   ( genBootstrapAddress,
     genSignature,
   )
-import Test.Shelley.Spec.Ledger.Utils (ShelleyTest)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, STGens)
 import Test.Tasty.QuickCheck (Gen, choose, elements)
 
 genHash :: forall a h. HashAlgorithm h => Gen (Hash.Hash h a)
@@ -156,7 +156,8 @@ instance
   ( ShelleyTest era,
     Mock (Crypto era),
     Arbitrary (WitnessSet era),
-    Arbitrary (Core.Value era)
+    Arbitrary (Core.Value era),
+    Arbitrary (Core.TxBody era)
   ) =>
   Arbitrary (Block era)
   where
@@ -268,7 +269,7 @@ instance (Era era, Mock (Crypto era)) => Arbitrary (Update era) where
   shrink = genericShrink
 
 instance
-  (ShelleyTest era, Mock (Crypto era), Arbitrary (Core.Value era)) =>
+  (STGens era, Mock (Crypto era), Arbitrary (Core.Value era)) =>
   Arbitrary (TxBody era)
   where
   -- Our arbitrary instance constructs things using the pattern in order to have
@@ -323,7 +324,7 @@ instance
   ( ShelleyTest era,
     Mock (Crypto era),
     Arbitrary (WitnessSet era),
-    Arbitrary (Core.Value era)
+    Arbitrary (Core.TxBody era)
   ) =>
   Arbitrary (Tx era)
   where
