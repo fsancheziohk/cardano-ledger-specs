@@ -58,12 +58,12 @@ import Test.Shelley.Spec.Ledger.Generator.Core (GenEnv (..))
 import Test.Shelley.Spec.Ledger.Generator.Presets (genUtxo0, genesisDelegs0)
 import Test.Shelley.Spec.Ledger.Generator.Update (genPParams)
 import Test.Shelley.Spec.Ledger.Shrinkers (shrinkBlock)
-import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, maxLLSupply, mkHash)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, STGens, maxLLSupply, mkHash)
 
 -- The CHAIN STS at the root of the STS allows for generating blocks of transactions
 -- with meaningful delegation certificates, protocol and application updates, withdrawals etc.
 instance
-  ( ShelleyTest era,
+  ( STGens era,
     GetLedgerView era,
     ApplyBlock era,
     STS (CHAIN era),
@@ -108,7 +108,7 @@ lastByronHeaderHash _ = HashHeader $ mkHash 0
 mkGenesisChainState ::
   forall era a.
   (ShelleyTest era) =>
-  Gen (Core.TxBody era) ->
+  Gen (Core.Value era) ->
   Constants ->
   IRC (CHAIN era) ->
   Gen (Either a (ChainState era))

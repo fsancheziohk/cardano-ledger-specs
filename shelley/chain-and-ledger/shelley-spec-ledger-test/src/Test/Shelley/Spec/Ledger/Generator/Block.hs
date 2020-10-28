@@ -54,6 +54,7 @@ import Test.Shelley.Spec.Ledger.Generator.Core
 import Test.Shelley.Spec.Ledger.Generator.Trace.Ledger ()
 import Test.Shelley.Spec.Ledger.Utils
   ( ShelleyTest,
+    STGens,
     epochFromSlotNo,
     maxKESIterations,
     runShelleyBase,
@@ -73,7 +74,7 @@ type TxGen era =
 -- | Generate a valid block.
 genBlock ::
   forall era.
-  ( ShelleyTest era,
+  ( STGens era,
     GetLedgerView era,
     ApplyBlock era,
     STS (LEDGER era),

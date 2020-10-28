@@ -33,7 +33,7 @@ import Data.Sequence.Strict (StrictSeq)
 import qualified Data.Sequence.Strict as StrictSeq
 import Data.Set (Set)
 import qualified Data.Set as Set
-import GHC.Records (HasField)
+import GHC.Records (HasField, getField)
 import GHC.Stack (HasCallStack)
 import Shelley.Spec.Ledger.API
   ( DCert,
@@ -312,7 +312,7 @@ genNextDelta
         ksIndexedPayScripts
       }
     )
-  tx
+  tx@(Tx txb _ _)
   delta@(Delta dfees extraInputs extraWitnesses change _ _) =
     let baseTxFee = minfee pparams tx
         encodedLen x = fromIntegral $ BSL.length (serialize x)
@@ -347,12 +347,13 @@ genNextDelta
                     }
               else -- add a new input to cover the fee
               do
+                let instx = getField @"inputs" txb
                 let utxo' =
                       -- Remove possible inputs from Utxo, if they already appear in inputs.
                       UTxO $
                         Map.withoutKeys
                           (unUTxO utxo)
-                          ((getField @"inputs" (_body tx)) <> extraInputs)
+                          (instx <> extraInputs)
                 (inputs, value, (vkeyPairs, msigPairs)) <- genInputs (1, 1) ksIndexedPaymentKeys ksIndexedPayScripts utxo'
                 -- It is possible that the Utxo has no possible inputs left, so fail. We try and keep this from happening
                 -- by using feedback: adding to the number of ouputs (in the call to genRecipients) in genTx above. Adding to the
