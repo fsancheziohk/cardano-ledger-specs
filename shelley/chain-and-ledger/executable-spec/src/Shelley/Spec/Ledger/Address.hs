@@ -52,6 +52,8 @@ module Shelley.Spec.Ledger.Address
     word7sToNat,
     Word7 (..),
     toWord7,
+
+    isBootstrapRedeemer,
   )
 where
 
@@ -481,3 +483,7 @@ bootstrapKeyHash (BootstrapAddress byronAddress) =
         fromMaybe (panic "bootstrapKeyHash: incorrect hash length") $
           Hash.hashFromBytes bytes
    in KeyHash hash
+
+isBootstrapRedeemer :: Addr era -> Bool
+isBootstrapRedeemer (AddrBootstrap (BootstrapAddress (Byron.Address _ _ Byron.ATRedeem))) = True
+isBootstrapRedeemer _ = False

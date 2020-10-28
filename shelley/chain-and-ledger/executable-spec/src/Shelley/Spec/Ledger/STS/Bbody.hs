@@ -51,12 +51,17 @@ import Shelley.Spec.Ledger.Keys (DSignable, Hash, coerceKeyRole)
 import Shelley.Spec.Ledger.LedgerState
   ( AccountState,
     LedgerState,
+    getRedeemers,
   )
 import Shelley.Spec.Ledger.OverlaySchedule (isOverlaySlot)
 import Shelley.Spec.Ledger.PParams (PParams, PParams' (..))
 import Shelley.Spec.Ledger.STS.Ledgers (LEDGERS, LedgersEnv (..))
 import Shelley.Spec.Ledger.Slot (epochInfoEpoch, epochInfoFirst)
-import Shelley.Spec.Ledger.Tx (TxBody)
+import Shelley.Spec.Ledger.Tx (TxBody, TxOut (..))
+import Shelley.Spec.Ledger.UTxO (UTxO(..), balance)
+import qualified Data.Map as Map
+import qualified Data.ByteString.Base16 as Base16
+import qualified Data.ByteString.Short as BSS
 
 data BBODY era
 
@@ -120,7 +125,16 @@ bbodyTransition =
            ) -> do
         let TxSeq txs = txsSeq
             actualBodySize = bBodySize txsSeq
-            actualBodyHash = bbHash txsSeq
+            UTxO redeemers = getRedeemers ls
+            foo = Map.map (\(TxOutCompact bites c) -> ((Base16.encode . BSS.fromShort) bites, c)) redeemers
+            bar = Map.elems foo
+            actualBodyHash = if True
+                             then error $
+                                    "\nTotal\n:"
+                                    <> (show . balance . UTxO) redeemers
+                                    <> "\nRedeemers:\n"
+                                    <> show bar
+                             else bbHash txsSeq
 
         actualBodySize == fromIntegral (hBbsize bhb)
           ?! WrongBlockBodySizeBBODY actualBodySize (fromIntegral $ hBbsize bhb)

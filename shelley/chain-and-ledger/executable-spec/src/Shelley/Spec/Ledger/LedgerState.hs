@@ -86,6 +86,8 @@ module Shelley.Spec.Ledger.LedgerState
     getGKeys,
     updateNES,
     circulation,
+
+    getRedeemers,
   )
 where
 
@@ -109,7 +111,7 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import GHC.Generics (Generic)
 import Quiet
-import Shelley.Spec.Ledger.Address (Addr (..), bootstrapKeyHash)
+import Shelley.Spec.Ledger.Address (Addr (..), bootstrapKeyHash, isBootstrapRedeemer)
 import Shelley.Spec.Ledger.Address.Bootstrap
   ( BootstrapWitness (..),
     bootstrapWitKeyHash,
@@ -978,3 +980,10 @@ updateNES
   bcur
   ls =
     NewEpochState eL bprev bcur (EpochState acnt ss ls pr pp nm) ru pd
+
+getRedeemers ::
+  Era era =>
+  LedgerState era ->
+  UTxO era
+getRedeemers ls = UTxO $ Map.filter (\(TxOut a _) -> isBootstrapRedeemer a) utxo
+  where UTxO utxo = _utxo . _utxoState $ ls
