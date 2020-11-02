@@ -72,6 +72,7 @@ type TxGen era =
   Gen (Seq (Tx era))
 
 -- | Generate a valid block.
+-- Specific to Shelley
 genBlock ::
   forall era.
   ( STGens era,
@@ -98,6 +99,8 @@ genBlock ge = genBlockWithTxGen genTxs ge
 
       sigGen @(LEDGERS era) ge ledgerEnv ls
 
+-- Still polymorphic over transaction type
+-- can reuse in ShelleyMA by passing TxGen for right era
 genBlockWithTxGen ::
   forall era.
   (ShelleyTest era, Mock (Crypto era), GetLedgerView era, ApplyBlock era) =>

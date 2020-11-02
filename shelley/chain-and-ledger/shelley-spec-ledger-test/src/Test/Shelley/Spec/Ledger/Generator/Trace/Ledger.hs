@@ -48,7 +48,7 @@ import Test.Shelley.Spec.Ledger.Generator.Presets (genUtxo0, genesisDelegs0)
 import Test.Shelley.Spec.Ledger.Generator.Update (genPParams)
 import Test.Shelley.Spec.Ledger.Generator.Utxo (genTx)
 import Test.Shelley.Spec.Ledger.Shrinkers (shrinkTx)
-import Test.Shelley.Spec.Ledger.Utils (applySTSTest, runShelleyBase, STGens)
+import Test.Shelley.Spec.Ledger.Utils (applySTSTest, runShelleyBase, ShelleyTest)
 
 genAccountState :: Constants -> Gen AccountState
 genAccountState (Constants {minTreasury, maxTreasury, minReserves, maxReserves}) =
@@ -59,7 +59,7 @@ genAccountState (Constants {minTreasury, maxTreasury, minReserves, maxReserves})
 -- The LEDGER STS combines utxo and delegation rules and allows for generating transactions
 -- with meaningful delegation certificates.
 instance
-  ( STGens era,
+  ( ShelleyTest era,
     STS (LEDGER era),
     BaseM (LEDGER era) ~ ShelleyBase,
     Mock (Crypto era),
@@ -67,6 +67,7 @@ instance
     State (LEDGER era) ~ (UTxOState era, DPState era),
     Signal (LEDGER era) ~ Tx era
   ) =>
+  Gen (Tx era) ->
   TQC.HasTrace (LEDGER era) (GenEnv era)
   where
   envGen GenEnv {geConstants} =
@@ -84,7 +85,7 @@ instance
 
 instance
   forall era.
-  ( STGens era,
+  ( ShelleyTest era,
     STS (LEDGER era),
     BaseM (LEDGER era) ~ ShelleyBase,
     Environment (LEDGER era) ~ LedgerEnv era,

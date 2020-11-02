@@ -39,7 +39,7 @@ import qualified Test.Tasty.QuickCheck as TQC
 proxyC :: Proxy C
 proxyC = Proxy
 
-minimalPropertyTests :: TQC.Gen (Core.TxBody C) -> TestTree
+minimalPropertyTests :: TQC.Gen (Tx C) -> TestTree
 minimalPropertyTests gv =
   testGroup
     "Minimal Property Tests"
@@ -58,7 +58,7 @@ minimalPropertyTests gv =
     ]
 
 -- | 'TestTree' of property-based testing properties.
-propertyTests :: TQC.Gen (Core.TxBody C) -> TestTree
+propertyTests :: TQC.Gen (Tx C) -> TestTree
 propertyTests gv =
   testGroup
     "Property-Based Testing"

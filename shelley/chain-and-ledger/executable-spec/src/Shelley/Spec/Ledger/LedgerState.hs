@@ -1025,7 +1025,7 @@ applyRUpd ru (EpochState as ss ls pr pp _nm) = EpochState as' ss ls' pr pp nm'
         (rs ru)
     as' =
       as
-        { _treasury = (addDelta (_treasury as) (deltaT ru)) <> fold (range unregRU),
+        { _treasury = (addDeltaCoin (_treasury as) (deltaT ru)) <> fold (range unregRU),
           _reserves = addDeltaCoin (_reserves as) (deltaR ru)
         }
     ls' =

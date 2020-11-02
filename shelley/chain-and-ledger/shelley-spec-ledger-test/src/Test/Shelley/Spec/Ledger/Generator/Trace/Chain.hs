@@ -63,7 +63,7 @@ import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, STGens, maxLLSupply, mkHash)
 -- The CHAIN STS at the root of the STS allows for generating blocks of transactions
 -- with meaningful delegation certificates, protocol and application updates, withdrawals etc.
 instance
-  ( STGens era,
+  ( ShelleyTest era,
     GetLedgerView era,
     ApplyBlock era,
     STS (CHAIN era),
