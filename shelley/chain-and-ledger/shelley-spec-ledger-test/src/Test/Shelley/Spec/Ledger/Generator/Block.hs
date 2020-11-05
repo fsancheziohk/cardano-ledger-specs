@@ -54,7 +54,6 @@ import Test.Shelley.Spec.Ledger.Generator.Core
 import Test.Shelley.Spec.Ledger.Generator.Trace.Ledger ()
 import Test.Shelley.Spec.Ledger.Utils
   ( ShelleyTest,
-    STGens,
     epochFromSlotNo,
     maxKESIterations,
     runShelleyBase,
@@ -62,6 +61,7 @@ import Test.Shelley.Spec.Ledger.Utils
     testGlobals,
   )
 import Shelley.Spec.Ledger.BaseTypes (ShelleyBase)
+import Test.Shelley.Spec.Ledger.Generator.Utxo (GenTxFunc (..))
 
 -- | Type alias for a transaction generator
 type TxGen era =
@@ -75,7 +75,8 @@ type TxGen era =
 -- Specific to Shelley
 genBlock ::
   forall era.
-  ( STGens era,
+  ( GenTxFunc era,
+    ShelleyTest era, 
     GetLedgerView era,
     ApplyBlock era,
     STS (LEDGER era),

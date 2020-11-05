@@ -5,6 +5,7 @@
 
 module Test.Shelley.Spec.Ledger.Shrinkers where
 
+import Cardano.Ledger.Crypto
 import qualified Cardano.Ledger.Core as Core
 import qualified Cardano.Ledger.Val as Val
 import Cardano.Ledger.Val ((<+>), (<->))
@@ -24,9 +25,11 @@ import Shelley.Spec.Ledger.PParams
 import Shelley.Spec.Ledger.Scripts
 import Shelley.Spec.Ledger.Slot
 import Shelley.Spec.Ledger.Tx
-import Shelley.Spec.Ledger.TxBody 
+import Shelley.Spec.Ledger.TxBody
 import Test.QuickCheck (shrinkIntegral, shrinkList)
-import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, STGens)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest)
+import Cardano.Ledger.Shelley (ShelleyEra)
+import Test.Shelley.Spec.Ledger.Orphans ()
 
 shrinkBlock ::
   Block h ->
@@ -34,10 +37,9 @@ shrinkBlock ::
 shrinkBlock _ = []
 
 shrinkTx ::
-  forall era.
-  STGens era =>
-  Tx era ->
-  [Tx era]
+  (Crypto c) =>
+  Tx (ShelleyEra c) ->
+  [Tx (ShelleyEra c)]
 shrinkTx (Tx _b _ws _md) =
   [Tx b' _ws _md | b' <- shrinkTxBody _b]
 
@@ -52,10 +54,9 @@ shrinkTx (Tx _b _ws _md) =
 -- the values, and revert this function to its prior incarnation, fixed to Coin
 -- ======
 shrinkTxBody ::
-  forall era.
-  STGens era =>
-  TxBody era ->
-  [TxBody era]
+  (Crypto c) =>
+  TxBody (ShelleyEra c) ->
+  [TxBody (ShelleyEra c)]
 -- do not shrink body in case of empty output list
 -- this will have to change in case any other part of TxBody will be shrunk
 shrinkTxBody (TxBody _ Empty _ _ _ _ _ _) = []

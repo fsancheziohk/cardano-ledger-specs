@@ -37,7 +37,6 @@ module Test.Shelley.Spec.Ledger.Utils
     getBlockNonce,
     ShelleyTest,
     Split (..),
-    STGens,
   )
 where
 
@@ -120,6 +119,7 @@ import Shelley.Spec.Ledger.Keys
     vKey,
     pattern KeyPair,
   )
+import Shelley.Spec.Ledger.Hashing (HashIndex, EraIndependentTxBody)
 import Shelley.Spec.Ledger.OCert (KESPeriod (..))
 import Shelley.Spec.Ledger.STS.Bbody (BBODY, BbodyPredicateFailure)
 import Shelley.Spec.Ledger.STS.Chain (CHAIN, ChainPredicateFailure)
@@ -139,21 +139,11 @@ import Test.Tasty.HUnit
 type ShelleyTest era =
   ( ShelleyBased era,
     Split (Core.Value era),
-    Core.Script era ~ MultiSig era,
-    PredicateFailure (CHAIN era) ~ ChainPredicateFailure era,
-    PredicateFailure (LEDGERS era) ~ LedgersPredicateFailure era,
-    PredicateFailure (LEDGER era) ~ LedgerPredicateFailure era,
-    PredicateFailure (BBODY era) ~ BbodyPredicateFailure era,
-    PredicateFailure (DELEGS era) ~ DelegsPredicateFailure era,
-    PredicateFailure (DELEG era) ~ DelegPredicateFailure era,
-    PredicateFailure (UTXOW era) ~ UtxowPredicateFailure era,
-    PredicateFailure (UTXO era) ~ UtxoPredicateFailure era
+    HashIndex (Core.TxBody era) ~ EraIndependentTxBody
   )
 
 class Split v where
   vsplit :: v -> Integer -> ([v], Coin)
-
-type STGens era = (ShelleyTest era, Core.TxBody era ~ TxBody era)
 
 -- =======================================================
 

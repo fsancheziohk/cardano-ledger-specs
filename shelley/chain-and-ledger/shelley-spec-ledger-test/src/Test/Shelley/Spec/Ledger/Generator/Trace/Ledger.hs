@@ -46,7 +46,7 @@ import Test.Shelley.Spec.Ledger.Generator.Constants (Constants (..))
 import Test.Shelley.Spec.Ledger.Generator.Core (GenEnv (..), genCoin)
 import Test.Shelley.Spec.Ledger.Generator.Presets (genUtxo0, genesisDelegs0)
 import Test.Shelley.Spec.Ledger.Generator.Update (genPParams)
-import Test.Shelley.Spec.Ledger.Generator.Utxo (genTx)
+import Test.Shelley.Spec.Ledger.Generator.Utxo (GenTxFunc (..))
 import Test.Shelley.Spec.Ledger.Shrinkers (shrinkTx)
 import Test.Shelley.Spec.Ledger.Utils (applySTSTest, runShelleyBase, ShelleyTest)
 
@@ -60,6 +60,7 @@ genAccountState (Constants {minTreasury, maxTreasury, minReserves, maxReserves})
 -- with meaningful delegation certificates.
 instance
   ( ShelleyTest era,
+    GenTxFunc era,
     STS (LEDGER era),
     BaseM (LEDGER era) ~ ShelleyBase,
     Mock (Crypto era),
@@ -67,7 +68,6 @@ instance
     State (LEDGER era) ~ (UTxOState era, DPState era),
     Signal (LEDGER era) ~ Tx era
   ) =>
-  Gen (Tx era) ->
   TQC.HasTrace (LEDGER era) (GenEnv era)
   where
   envGen GenEnv {geConstants} =
@@ -76,16 +76,19 @@ instance
       <*> genPParams geConstants
       <*> genAccountState geConstants
 
-  sigGen = genTx
+  sigGen = genTxFunc
 
-  shrinkSignal = shrinkTx
+  -- TODO shrink
+  shrinkSignal stx = []
 
   type BaseEnv (LEDGER era) = Globals
   interpretSTS globals act = runIdentity $ runReaderT act globals
 
+-- TODO does anything here constrain era to ShelleyEra?
 instance
   forall era.
   ( ShelleyTest era,
+    GenTxFunc era,
     STS (LEDGER era),
     BaseM (LEDGER era) ~ ShelleyBase,
     Environment (LEDGER era) ~ LedgerEnv era,
@@ -124,7 +127,7 @@ instance
           Gen (UTxOState era, DPState era, [Tx era])
         genAndApplyTx (u, dp, txs) ix = do
           let ledgerEnv = LedgerEnv slotNo ix pParams reserves
-          tx <- genTx ge ledgerEnv (u, dp)
+          tx <- genTxFunc ge ledgerEnv (u, dp)
 
           let res =
                 runShelleyBase $

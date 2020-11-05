@@ -55,6 +55,7 @@ where
 import Cardano.Crypto.DSIGN.Class (DSIGNAlgorithm (..))
 import Cardano.Crypto.VRF (evalCertified)
 import qualified Cardano.Ledger.Core as Core
+import Cardano.Ledger.Shelley (ShelleyEra)
 import Cardano.Ledger.Crypto (DSIGN)
 import qualified Cardano.Ledger.Crypto as CC (Crypto)
 import Cardano.Ledger.Era (Crypto (..))
@@ -508,6 +509,7 @@ genTxOut gv Constants {maxGenesisOutputVal, minGenesisOutputVal} addrs = do
 -- and with values between 'minCoin' and 'maxCoin'.
 -- NOTE we pass here a Value generator gv that is piped in from where
 -- it can be defined in the necessary context (see Tests.hs)
+-- TODO make sure this mostly generates values satisfying the min deposit condition
 genValList ::
   (ShelleyTest era) =>
   QC.Gen (Core.Value era) ->

@@ -91,6 +91,7 @@ import Shelley.Spec.Ledger.Rewards
     LogWeight (..),
     PerformanceEstimate (..),
   )
+import Shelley.Spec.Ledger.Hashing (HashIndex, EraIndependentTxBody)
 import qualified Shelley.Spec.Ledger.STS.Deleg as STS
 import qualified Shelley.Spec.Ledger.STS.Delegs as STS
 import qualified Shelley.Spec.Ledger.STS.Delpl as STS
@@ -131,7 +132,7 @@ import Test.Shelley.Spec.Ledger.Serialisation.Generators.Bootstrap
   ( genBootstrapAddress,
     genSignature,
   )
-import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, STGens)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest)
 import Test.Tasty.QuickCheck (Gen, choose, elements)
 
 genHash :: forall a h. HashAlgorithm h => Gen (Hash.Hash h a)
@@ -269,7 +270,10 @@ instance (Era era, Mock (Crypto era)) => Arbitrary (Update era) where
   shrink = genericShrink
 
 instance
-  (STGens era, Mock (Crypto era), Arbitrary (Core.Value era)) =>
+  (Core.Script era ~ MultiSig era,
+  ShelleyTest era,
+  HashIndex (Core.TxBody era) ~ EraIndependentTxBody,
+  Mock (Crypto era), Arbitrary (Core.Value era)) =>
   Arbitrary (TxBody era)
   where
   -- Our arbitrary instance constructs things using the pattern in order to have
@@ -395,7 +399,7 @@ instance
   arbitrary = genericArbitraryU
   -- we don't have a shrinker for Value, so we do not shrink this
   -- predicate failure, as its constructor contains Value
-  shrink pf = [pf]
+  shrink pf = []
 
 instance
   ( ShelleyTest era,
@@ -405,7 +409,7 @@ instance
   Arbitrary (STS.UtxowPredicateFailure era)
   where
   arbitrary = genericArbitraryU
-  shrink = genericShrink
+  shrink pf = []
 
 instance
   Era era =>
@@ -446,7 +450,7 @@ instance
   Arbitrary (STS.LedgerPredicateFailure era)
   where
   arbitrary = genericArbitraryU
-  shrink = genericShrink
+  shrink pf = []
 
 instance
   ( ShelleyTest era,

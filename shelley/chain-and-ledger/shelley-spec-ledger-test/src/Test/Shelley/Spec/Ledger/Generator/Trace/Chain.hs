@@ -52,18 +52,20 @@ import Test.QuickCheck (Gen)
 import Test.Shelley.Spec.Ledger.ConcreteCryptoTypes
   ( Mock,
   )
+import Test.Shelley.Spec.Ledger.Generator.Utxo (GenTxFunc (..))
 import Test.Shelley.Spec.Ledger.Generator.Block (genBlock)
 import Test.Shelley.Spec.Ledger.Generator.Constants (Constants (..))
 import Test.Shelley.Spec.Ledger.Generator.Core (GenEnv (..))
 import Test.Shelley.Spec.Ledger.Generator.Presets (genUtxo0, genesisDelegs0)
 import Test.Shelley.Spec.Ledger.Generator.Update (genPParams)
 import Test.Shelley.Spec.Ledger.Shrinkers (shrinkBlock)
-import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, STGens, maxLLSupply, mkHash)
+import Test.Shelley.Spec.Ledger.Utils (ShelleyTest, maxLLSupply, mkHash)
 
 -- The CHAIN STS at the root of the STS allows for generating blocks of transactions
 -- with meaningful delegation certificates, protocol and application updates, withdrawals etc.
 instance
   ( ShelleyTest era,
+    GenTxFunc era, 
     GetLedgerView era,
     ApplyBlock era,
     STS (CHAIN era),
