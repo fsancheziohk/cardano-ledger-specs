@@ -35,6 +35,7 @@ library
                      , Data.CannonicalMaps
                      , Data.MemoBytes
                      , Data.Coders
+                     , Data.CodersInline
                      , Control.Iterate.SetAlgebra
                      , Control.Iterate.Collect
                      , Control.SetAlgebra

@@ -22,7 +22,7 @@
 
 module Cardano.Ledger.ShelleyMA.TxBody
   ( TxBody (TxBody, STxBody),
-    TxBody' (..),
+    TxBody' (..), FamsFrom, FamsTo,
   )
 where
 

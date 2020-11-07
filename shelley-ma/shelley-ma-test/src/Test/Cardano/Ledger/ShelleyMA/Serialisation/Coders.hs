@@ -28,6 +28,7 @@ module Test.Cardano.Ledger.ShelleyMA.Serialisation.Coders
     roundTrip,
     roundTrip',
     embedTrip,
+    embedTrip',
     roundTripAnn,
     embedTripAnn,
     RoundTripResult,
@@ -129,6 +130,9 @@ roundTripAnn s =
 -- | Can we serialise a type, and then deserialise it as something else?
 embedTrip :: (ToCBOR t,FromCBOR s) => t -> RoundTripResult s
 embedTrip s = deserialiseFromBytes fromCBOR (toLazyByteString (toCBOR s))
+
+embedTrip' :: (s -> Encoding) -> (forall x.Decoder x t) -> s -> RoundTripResult t
+embedTrip' enc dec s = deserialiseFromBytes dec (toLazyByteString (enc s))
 
 embedTripAnn :: forall s t. (ToCBOR t, FromCBOR (Annotator s)) => t -> RoundTripResult s
 embedTripAnn s =

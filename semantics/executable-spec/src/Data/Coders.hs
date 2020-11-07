@@ -50,6 +50,8 @@ module Data.Coders
     decodeRecordNamed,
     decodeRecordSum,
     invalidKey,
+    unusedRequiredKeys,
+    duplicateKey,
     wrapCBORArray,
     encodeFoldable,
     decodeCollectionWithLen,
@@ -63,12 +65,15 @@ module Data.Coders
     dualText,
     dualStrictSeq,
     dualCBOR,
+    roundTrip,
+    roundTrip',
     to,
     from,
     Decoder,
     Encoding,
     encodeNullMaybe,
     decodeNullMaybe,
+    decodeSparse,
   )
 where
 
@@ -76,6 +81,9 @@ import Cardano.Prelude (cborError)
 import Control.Monad (replicateM,unless)
 import Codec.CBOR.Decoding (Decoder)
 import Codec.CBOR.Encoding (Encoding)
+import Codec.CBOR.Read(DeserialiseFailure,deserialiseFromBytes)
+import Codec.CBOR.Write (toLazyByteString)
+import qualified Data.ByteString.Lazy as Lazy
 import Cardano.Binary
   ( FromCBOR (fromCBOR),
     ToCBOR (toCBOR),
@@ -570,6 +578,16 @@ to xs = ED dualCBOR xs
 
 from ::  (ToCBOR t, FromCBOR t) => Decode ('Closed 'Dense) t
 from = DD dualCBOR
+
+-- Writing roundTrip properties
+
+type Answer t = Either Codec.CBOR.Read.DeserialiseFailure (Lazy.ByteString, t)
+
+roundTrip :: (ToCBOR t,FromCBOR t) => t -> Answer t
+roundTrip s = deserialiseFromBytes fromCBOR (toLazyByteString (toCBOR s))
+
+roundTrip' ::(t ->  Encoding) -> (forall s. Decoder s t) -> t -> Answer t
+roundTrip' enc dec t = deserialiseFromBytes dec  (toLazyByteString (enc t))
 
 -- ==================================================================
 -- A Guide to Visual inspection of Duality in Encode and Decode

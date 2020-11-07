@@ -12,10 +12,12 @@ import Cardano.Slotting.Slot (SlotNo (..))
 import Cardano.Ledger.Era(Era(..))
 import Cardano.Ledger.ShelleyMA.Timelocks
   ( Timelock (RequireSignature, RequireAllOf, RequireAnyOf, RequireMOf, RequireTimeExpire, RequireTimeStart),
+    ValidityInterval(..),
   )
 import Data.Sequence.Strict (fromList)
 import Shelley.Spec.Ledger.Keys (KeyHash (..))
 import Shelley.Spec.Ledger.BaseTypes (StrictMaybe (SJust, SNothing))
+import qualified Cardano.Ledger.Mary.Value as ConcreteValue
 import Test.Shelley.Spec.Ledger.Serialisation.Generators(mkDummyHash) -- imports arbitray instance for MultiSig
 import Test.Tasty.QuickCheck hiding (scale)
 
@@ -49,3 +51,15 @@ sizedTimelock n =
 
 instance (Era era) => Arbitrary (Timelock era) where
   arbitrary = sizedTimelock maxTimelockDepth
+
+instance Arbitrary ValidityInterval where
+  arbitrary = ValidityInterval <$> arbitrary <*> arbitrary
+
+instance Arbitrary (ConcreteValue.AssetID) where
+  arbitrary = ConcreteValue.AssetID <$> arbitrary
+
+instance Era era => Arbitrary (ConcreteValue.PolicyID era) where
+  arbitrary = ConcreteValue.PolicyID <$> arbitrary
+
+instance Era era => Arbitrary (ConcreteValue.Value era) where
+  arbitrary = ConcreteValue.Value <$> arbitrary <*> arbitrary
